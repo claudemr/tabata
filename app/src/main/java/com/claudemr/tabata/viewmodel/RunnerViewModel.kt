@@ -46,29 +46,8 @@ class RunnerViewModel(
         }
     }
 
-    private fun startCurrentStep() {
+    fun moveForward() {
         when (val step = state.currentStep) {
-            is WorkoutStep.Rest -> {
-                speechManager.say("Repos, ${step.duration.totalSeconds()} secondes") {
-                    startTimer(step.duration)
-                }
-            }
-
-            is WorkoutStep.Timed -> {
-                speechManager.say(
-                    "${step.title}, ${step.duration.totalSeconds()} secondes. Go!"
-                ) {
-                    startTimer(step.duration)
-                }
-            }
-
-            is WorkoutStep.Manual -> {
-                speechManager.say(step.title)
-                state = state.copy(
-                    isRunning = false
-                )
-            }
-
             null -> {
                 state = state.copy(
                     isFinished = true,
@@ -76,11 +55,32 @@ class RunnerViewModel(
                     isPaused = false
                 )
             }
+            else -> {
+                if (!state.isResting) {
+                    state = state.copy(
+                        isResting = true
+                    )
+                    speechManager.say(
+                        "Repos, ${step.rest.toFrenchTts()}. C'est parti!"
+                    ) {
+                        startTimer(step.rest)
+                    }
+                } else {
+                    if (state.currentSet < step.nbSets) {
+                        state = state.copy(
+                            isResting = false,
+                            currentSet = state.currentSet + 1
+                        )
+                        startCurrentStep()
+                    } else {
+                        state = state.copy(
+                            isResting = false
+                        )
+                        moveToNextStep()
+                    }
+                }
+            }
         }
-    }
-
-    fun completeCurrentStep() {
-        moveToNextStep()
     }
 
     fun pause() {
@@ -103,6 +103,40 @@ class RunnerViewModel(
         }
     }
 
+    private fun startCurrentStep() {
+        var setNumber = state.currentSet + 1
+
+        when (val step = state.currentStep) {
+            is WorkoutStep.Timed -> {
+                speechManager.say(
+                    "${step.name}, ${step.duration.toFrenchTts()}. " +
+                            "Série ${setNumber} sur ${step.nbSets}. " +
+                            "Préparez-vous : 3, 2, 1, go!"
+                ) {
+                    startTimer(step.duration)
+                }
+            }
+
+            is WorkoutStep.Manual -> {
+                speechManager.say(
+                    "${step.name}, ${step.nbReps} répétitions. " +
+                            "Série ${setNumber} sur ${step.nbSets}."
+                )
+                state = state.copy(
+                    isRunning = false
+                )
+            }
+
+            null -> {
+                state = state.copy(
+                    isFinished = true,
+                    isRunning = false,
+                    isPaused = false
+                )
+            }
+        }
+    }
+
     private fun moveToNextStep() {
         val nextIndex = state.currentStepIndex + 1
 
@@ -118,7 +152,8 @@ class RunnerViewModel(
 
         speechManager.say("Suivant") {
             state = state.copy(
-                currentStepIndex = nextIndex
+                currentStepIndex = nextIndex,
+                currentSet = 0
             )
             startCurrentStep()
         }
@@ -129,7 +164,7 @@ class RunnerViewModel(
         if (!resuming)
             timerJob?.cancel()
 
-        val remainingSeconds = if (resuming) state.remainingSeconds else duration.totalSeconds()
+        val remainingSeconds = if (resuming) state.remainingSeconds else duration.seconds
         state = state.copy(
             remainingSeconds = remainingSeconds,
             isRunning = true,
@@ -149,7 +184,7 @@ class RunnerViewModel(
                 }
             }
 
-            moveToNextStep()
+            moveForward()
         }
     }
 }

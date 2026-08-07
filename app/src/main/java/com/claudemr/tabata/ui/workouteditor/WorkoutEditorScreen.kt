@@ -17,8 +17,6 @@ import com.claudemr.tabata.viewmodel.WorkoutEditorViewModel
 import com.claudemr.tabata.navigation.Screen
 
 import android.util.Log
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 
 @Composable
 fun WorkoutEditorScreen(
@@ -110,7 +108,7 @@ fun WorkoutEditorScreen(
                         Column(
                             modifier = Modifier.padding(16.dp)
                         ) {
-                            Text(step.title)
+                            Text(step.name)
                             Text(step.subtitle())
                         }
                         Row {

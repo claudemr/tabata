@@ -19,35 +19,47 @@ class StepEditorViewModel : ViewModel() {
     }
 
     fun setTitle(title: String) {
-        state = state.copy(title = title)
+        state = state.copy(name = title)
     }
 
     fun setDescription(description: String) {
         state = state.copy(description = description)
     }
 
+    fun setNbReps(nbReps: Int) {
+        state = state.copy(nbReps = nbReps)
+    }
+
     fun setDuration(duration: Duration) {
         state = state.copy(duration = duration)
+    }
+
+    fun setRestDuration(rest: Duration) {
+        state = state.copy(rest = rest)
+    }
+
+    fun setNbSets(nbSets: Int) {
+        state = state.copy(nbSets = nbSets)
     }
 
     fun buildStep(): WorkoutStep {
         return when (state.type) {
             StepType.MANUAL ->
                 WorkoutStep.Manual(
-                    title = state.title,
-                    description = state.description
+                    name = state.name,
+                    description = state.description,
+                    nbReps = state.nbReps,
+                    rest = state.rest,
+                    nbSets = state.nbSets
                 )
 
             StepType.TIMED ->
                 WorkoutStep.Timed(
-                    title = state.title,
+                    name = state.name,
                     description = state.description,
-                    duration = state.duration
-                )
-
-            StepType.REST ->
-                WorkoutStep.Rest(
-                    duration = state.duration
+                    duration = state.duration,
+                    rest = state.rest,
+                    nbSets = state.nbSets
                 )
         }
     }
@@ -57,22 +69,21 @@ class StepEditorViewModel : ViewModel() {
             is WorkoutStep.Manual ->
                 state = StepEditorState(
                     type = StepType.MANUAL,
-                    title = step.title,
-                    description = step.description
+                    name = step.name,
+                    description = step.description,
+                    nbReps = step.nbReps,
+                    rest = step.rest,
+                    nbSets = step.nbSets
                 )
 
             is WorkoutStep.Timed ->
                 state = StepEditorState(
                     type = StepType.TIMED,
-                    title = step.title,
+                    name = step.name,
                     description = step.description,
-                    duration = step.duration
-                )
-
-            is WorkoutStep.Rest ->
-                state = StepEditorState(
-                    type = StepType.REST,
-                    duration = step.duration
+                    duration = step.duration,
+                    rest = step.rest,
+                    nbSets = step.nbSets
                 )
         }
     }

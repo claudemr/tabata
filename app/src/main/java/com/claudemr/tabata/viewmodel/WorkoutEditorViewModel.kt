@@ -70,7 +70,7 @@ class WorkoutEditorViewModel(
     }
 
     fun addStep(step: WorkoutStep) {
-        Log.d("TABATA", "Add step_title=${step.title}")
+        Log.d("TABATA", "Add step_title=${step.name}")
         state = state.copy(
             steps = state.steps + step
         )

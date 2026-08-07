@@ -4,7 +4,10 @@ import com.claudemr.tabata.model.Duration
 
 data class StepEditorState(
     val type: StepType = StepType.MANUAL,
-    val title: String = "",
+    val name: String = "",
     val description: String = "",
-    val duration: Duration = Duration(seconds = 30)
+    val rest: Duration = Duration(seconds = 60),
+    val nbSets: Int = 1,
+    val nbReps: Int = 15,
+    val duration: Duration = Duration(seconds = 60)
 )

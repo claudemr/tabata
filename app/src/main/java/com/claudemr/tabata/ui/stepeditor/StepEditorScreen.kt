@@ -24,12 +24,23 @@ fun StepEditorScreen(
     stepIndex: Int
 ) {
     val isEditing = stepIndex >= 0
-    val viewModel: StepEditorViewModel = viewModel()
+    val stepEditorViewModel: StepEditorViewModel = viewModel()
     val step = if (isEditing) workoutEditorViewModel.state.steps[stepIndex] else null
     val initialDuration = when (step) {
-        is WorkoutStep.Rest -> step.duration.totalSeconds()
-        is WorkoutStep.Timed -> step.duration.totalSeconds()
-        else -> 30
+        is WorkoutStep.Timed -> step.duration.seconds
+        else -> 60
+    }
+    val initialNbReps = when (step) {
+        is WorkoutStep.Manual -> step.nbReps
+        else -> 15
+    }
+    val initialRestDuration = when (step) {
+        is WorkoutStep.Timed, is WorkoutStep.Manual -> step.rest.seconds
+        else -> 60
+    }
+    val initialNbSets = when (step) {
+        is WorkoutStep.Timed, is WorkoutStep.Manual -> step.nbSets
+        else -> 1
     }
 
     var minutes by remember(stepIndex) {
@@ -40,10 +51,26 @@ fun StepEditorScreen(
         mutableStateOf((initialDuration % 60).toString())
     }
 
+    var restMins by remember(stepIndex) {
+        mutableStateOf((initialRestDuration / 60).toString())
+    }
+
+    var restSecs by remember(stepIndex) {
+        mutableStateOf((initialRestDuration % 60).toString())
+    }
+
+    var nbReps by remember(stepIndex) {
+        mutableStateOf(initialNbReps.toString())
+    }
+
+    var nbSets by remember(stepIndex) {
+        mutableStateOf(initialNbSets.toString())
+    }
+
 
     LaunchedEffect(stepIndex) {
         if (isEditing) {
-            viewModel.load(workoutEditorViewModel.getStep(stepIndex))
+            stepEditorViewModel.load(workoutEditorViewModel.getStep(stepIndex))
         }
     }
 
@@ -66,8 +93,8 @@ fun StepEditorScreen(
         ) {
             StepType.entries.forEachIndexed { index, type ->
                 SegmentedButton(
-                    selected = viewModel.state.type == type,
-                    onClick = { viewModel.setType(type) },
+                    selected = stepEditorViewModel.state.type == type,
+                    onClick = { stepEditorViewModel.setType(type) },
                     shape = SegmentedButtonDefaults.itemShape(
                         index = index,
                         count = StepType.entries.size
@@ -77,83 +104,149 @@ fun StepEditorScreen(
                         when (type) {
                             StepType.MANUAL -> "Manuel"
                             StepType.TIMED -> "Timer"
-                            StepType.REST -> "Repos"
                         }
                     )
                 }
             }
         }
 
-        if (viewModel.state.type != StepType.REST) {
-            OutlinedTextField(
-                value = viewModel.state.title,
-                onValueChange = viewModel::setTitle,
-                label = { Text("Nom") },
-                modifier = Modifier.fillMaxWidth()
-            )
+        OutlinedTextField(
+            value = stepEditorViewModel.state.name,
+            onValueChange = stepEditorViewModel::setTitle,
+            label = { Text("Nom") },
+            modifier = Modifier.fillMaxWidth()
+        )
 
-            OutlinedTextField(
-                value = viewModel.state.description,
-                onValueChange = viewModel::setDescription,
-                label = { Text("Description") },
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+        OutlinedTextField(
+            value = stepEditorViewModel.state.description,
+            onValueChange = stepEditorViewModel::setDescription,
+            label = { Text("Description") },
+            modifier = Modifier.fillMaxWidth()
+        )
 
-        if (
-            viewModel.state.type == StepType.TIMED ||
-            viewModel.state.type == StepType.REST
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+        when (stepEditorViewModel.state.type) {
+            StepType.MANUAL -> {
                 OutlinedTextField(
-                    value = minutes,
+                    value = nbReps,
                     onValueChange = {
-                        minutes = it
-
-                        viewModel.setDuration(
-                            Duration(
-                                minutes = minutes.toIntOrNull() ?: 0,
-                                seconds = seconds.toIntOrNull() ?: 0
-                            )
-                        )
+                        nbReps = it
+                        stepEditorViewModel.setNbReps(nbReps.toIntOrNull() ?: 0)
                     },
-                    modifier = Modifier.weight(1f),
-                    label = { Text("Minutes") },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number
-                    )
-                )
-
-                OutlinedTextField(
-                    value = seconds,
-                    onValueChange = {
-                        seconds = it
-
-                        viewModel.setDuration(
-                            Duration(
-                                minutes = minutes.toIntOrNull() ?: 0,
-                                seconds = seconds.toIntOrNull() ?: 0
-                            )
-                        )
-                    },
-                    modifier = Modifier.weight(1f),
-                    label = { Text("Secondes") },
+                    label = { Text("Répétitions") },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
                     )
                 )
             }
+
+            StepType.TIMED -> {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedTextField(
+                        value = minutes,
+                        onValueChange = {
+                            minutes = it
+                            val curMin = minutes.toIntOrNull() ?: 0
+                            val curSec = seconds.toIntOrNull() ?: 0
+                            stepEditorViewModel.setDuration(
+                                Duration(curMin * 60 + curSec)
+                            )
+                        },
+                        modifier = Modifier.weight(1f),
+                        label = { Text("Minutes") },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        )
+                    )
+
+                    OutlinedTextField(
+                        value = seconds,
+                        onValueChange = {
+                            seconds = it
+                            val curMin = minutes.toIntOrNull() ?: 0
+                            val curSec = seconds.toIntOrNull() ?: 0
+                            stepEditorViewModel.setDuration(
+                                Duration(curMin * 60 + curSec)
+                            )
+                        },
+                        modifier = Modifier.weight(1f),
+                        label = { Text("Secondes") },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        )
+                    )
+                }
+            }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text("Repos")
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            OutlinedTextField(
+                value = restMins,
+                onValueChange = {
+                    restMins = it
+                    val curMin = restMins.toIntOrNull() ?: 0
+                    val curSec = restSecs.toIntOrNull() ?: 0
+
+                    stepEditorViewModel.setRestDuration(
+                        Duration(curMin * 60 + curSec)
+                    )
+                },
+                modifier = Modifier.weight(1f),
+                label = { Text("Minutes") },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                )
+            )
+
+            OutlinedTextField(
+                value = restSecs,
+                onValueChange = {
+                    restSecs = it
+                    val curMin = restMins.toIntOrNull() ?: 0
+                    val curSec = restSecs.toIntOrNull() ?: 0
+
+                    stepEditorViewModel.setRestDuration(
+                        Duration(curMin * 60 + curSec)
+                    )
+                },
+                modifier = Modifier.weight(1f),
+                label = { Text("Secondes") },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                )
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text("Nombre de série")
+
+        OutlinedTextField(
+            value = nbSets,
+            onValueChange = {
+                nbSets = it
+                stepEditorViewModel.setNbSets(nbSets.toIntOrNull() ?: 0)
+            },
+            label = { Text("Nombre de série") },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            )
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                val step = viewModel.buildStep()
+                val step = stepEditorViewModel.buildStep()
 
                 if (stepIndex == -1)
                     workoutEditorViewModel.addStep(step)

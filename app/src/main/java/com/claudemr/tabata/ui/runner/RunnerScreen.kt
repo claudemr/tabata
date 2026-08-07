@@ -52,27 +52,53 @@ fun RunnerScreen(
         )
 
         when (step) {
-            is WorkoutStep.Rest -> {
-                Text("Repos")
-                Text("${state.remainingSeconds}s")
-            }
-
             is WorkoutStep.Timed -> {
-                Text(step.title)
+                Text(step.name)
                 Text(step.description)
-                Text("${state.remainingSeconds}s")
+                Text("Série ${state.currentSet + 1} / ${step.nbSets}")
+                if (!state.isResting) {
+                    Text("${state.remainingSeconds}s")
+                    Button(
+                        onClick = {
+                            if (state.isPaused)
+                                runnerViewModel.resume()
+                            else
+                                runnerViewModel.pause()
+                        }
+                    ) {
+                        Text(
+                            if (state.isPaused)
+                                "Reprendre"
+                            else
+                                "Pause"
+                        )
+                    }
+                    if (state.isPaused)
+                        Text("PAUSE")
+
+                    Button(
+                        onClick = {
+                            runnerViewModel.moveForward()
+                        }
+                    ) {
+                        Text("Suivant")
+                    }
+                }
             }
 
             is WorkoutStep.Manual -> {
-                Text(step.title)
+                Text(step.name)
                 Text(step.description)
-
-                Button(
-                    onClick = {
-                        runnerViewModel.completeCurrentStep()
+                Text("Répétitions: ${step.nbReps}")
+                Text("Série ${state.currentSet + 1} / ${step.nbSets}")
+                if (!state.isResting) {
+                    Button(
+                        onClick = {
+                            runnerViewModel.moveForward()
+                        }
+                    ) {
+                        Text("Série terminée")
                     }
-                ) {
-                    Text("Exercice terminé")
                 }
             }
 
@@ -80,7 +106,10 @@ fun RunnerScreen(
                 Text("Séance terminée")
             }
         }
-        if (step is WorkoutStep.Rest || step is WorkoutStep.Timed) {
+
+        if (state.isResting) {
+            Text("Repos")
+            Text("${state.remainingSeconds}s")
             Button(
                 onClick = {
                     if (state.isPaused)
@@ -98,7 +127,16 @@ fun RunnerScreen(
             }
             if (state.isPaused)
                 Text("PAUSE")
+
+            Button(
+                onClick = {
+                    runnerViewModel.moveForward()
+                }
+            ) {
+                Text("Suivant")
+            }
         }
+
         Spacer(Modifier.height(32.dp))
 
         Text(
