@@ -41,14 +41,14 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Mes séances",
+            text = "Mes circuits",
             style = MaterialTheme.typography.headlineSmall
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         if (workouts.isEmpty()) {
-            Text("Aucune séance enregistrée.")
+            Text("Aucun circuit enregistré.")
         } else {
             LazyColumn {
                 items(workouts) { workout ->

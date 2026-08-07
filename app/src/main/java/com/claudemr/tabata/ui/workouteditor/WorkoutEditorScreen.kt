@@ -17,6 +17,8 @@ import com.claudemr.tabata.viewmodel.WorkoutEditorViewModel
 import com.claudemr.tabata.navigation.Screen
 
 import android.util.Log
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 
 @Composable
 fun WorkoutEditorScreen(
@@ -36,7 +38,7 @@ fun WorkoutEditorScreen(
     ) {
 
         Text(
-            text = "Nouvelle séance",
+            text = "Nouveau circuit",
             style = MaterialTheme.typography.headlineMedium
         )
 
@@ -44,36 +46,24 @@ fun WorkoutEditorScreen(
 
         OutlinedTextField(
             value = workoutEditorViewModel.state.name,
-            onValueChange = workoutEditorViewModel::updateName,
+            onValueChange = workoutEditorViewModel::setName,
             label = { Text("Nom") }
         )
 
         OutlinedTextField(
             value = workoutEditorViewModel.state.description,
-            onValueChange = workoutEditorViewModel::updateDescription,
+            onValueChange = workoutEditorViewModel::setDescription,
             label = { Text("Description") }
         )
 
-        Spacer(Modifier.height(16.dp))
-        Spacer(Modifier.weight(1f))
-
-        Text(
-            text = "Étapes",
-            style = MaterialTheme.typography.titleLarge
+        OutlinedTextField(
+            value = workoutEditorViewModel.state.nbTurns.toString(),
+            onValueChange = workoutEditorViewModel::setNbTurns,
+            label = { Text("Nombre de tours") },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            )
         )
-
-        Spacer(Modifier.height(8.dp))
-
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                navController.navigate(
-                    Screen.StepEditor.route(-1)
-                )
-            }
-        ) {
-            Text("Ajouter une étape")
-        }
 
         Spacer(Modifier.height(8.dp))
 
@@ -90,8 +80,21 @@ fun WorkoutEditorScreen(
 
         Spacer(Modifier.height(8.dp))
 
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                navController.navigate(
+                    Screen.StepEditor.route(-1)
+                )
+            }
+        ) {
+            Text("Ajouter un exercice")
+        }
+
+        Spacer(Modifier.height(8.dp))
+
         if (workoutEditorViewModel.state.steps.isEmpty()) {
-            Text("Aucune étape")
+            Text("Aucun exercice")
         } else {
             LazyColumn {
                 itemsIndexed(workoutEditorViewModel.state.steps) { index, step ->

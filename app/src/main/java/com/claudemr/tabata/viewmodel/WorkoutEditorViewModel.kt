@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.claudemr.tabata.model.Duration
 import com.claudemr.tabata.model.Workout
 import com.claudemr.tabata.model.WorkoutStep
 import com.claudemr.tabata.repository.IWorkoutRepository
@@ -22,12 +23,16 @@ class WorkoutEditorViewModel(
         state = WorkoutEditorState()
     }
 
-    fun updateName(name: String) {
+    fun setName(name: String) {
         state = state.copy(name = name)
     }
 
-    fun updateDescription(description: String) {
+    fun setDescription(description: String) {
         state = state.copy(description = description)
+    }
+
+    fun setNbTurns(nbTurns: String) {
+        state = state.copy(nbTurns = nbTurns.toIntOrNull() ?: 0)
     }
 
     fun save() {
@@ -36,23 +41,17 @@ class WorkoutEditorViewModel(
                 id = state.id,
                 name = state.name,
                 description = state.description,
+                nbTurns = state.nbTurns,
                 steps = state.steps.toMutableList()
             )
         )
+        Log.w("TABATA", "Save Workout ${savedWorkout.name} nbTurns=${savedWorkout.nbTurns}")
 
         // Get the generated id
         state = state.copy(id = savedWorkout.id)
     }
 
     fun load(workoutId: Long) {
-        if (
-            state.id != 0L ||
-            state.name.isNotBlank() ||
-            state.description.isNotBlank() ||
-            state.steps.isNotEmpty()
-        )
-            return
-
         if (workoutId == 0L) {
             state = WorkoutEditorState()
             return
@@ -60,11 +59,13 @@ class WorkoutEditorViewModel(
 
         val workout = repository.findById(workoutId)
             ?: return
+        Log.w("TABATA", " Load Workout ${workout.name} nbTurns=${workout.nbTurns}")
 
         state = WorkoutEditorState(
             id = workout.id,
             name = workout.name,
             description = workout.description,
+            nbTurns = workout.nbTurns,
             steps = workout.steps
         )
     }

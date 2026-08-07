@@ -39,7 +39,7 @@ fun RunnerScreen(
 
     if (state.isFinished) {
         Text(
-            text = "Séance terminée !"
+            text = "Circuit terminé !"
         )
         return
     }
@@ -48,14 +48,23 @@ fun RunnerScreen(
 
         Text(
             text = state.workout?.name ?: "",
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineLarge
         )
+
+        Text("Tour ${state.currentTurn + 1} / ${state.workout?.nbTurns}")
 
         when (step) {
             is WorkoutStep.Timed -> {
-                Text(step.name)
-                Text(step.description)
-                Text("Série ${state.currentSet + 1} / ${step.nbSets}")
+                Text(
+                    text = step.name,
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                if (step.description.isNotBlank())
+                    Text(step.description)
+                Text(
+                    text = "Série ${state.currentSet + 1} / ${step.nbSets}",
+                    style = MaterialTheme.typography.headlineSmall
+                )
                 if (!state.isResting) {
                     Text("${state.remainingSeconds}s")
                     Button(
@@ -74,7 +83,10 @@ fun RunnerScreen(
                         )
                     }
                     if (state.isPaused)
-                        Text("PAUSE")
+                        Text(
+                            text = "EN PAUSE",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
 
                     Button(
                         onClick = {
@@ -87,10 +99,17 @@ fun RunnerScreen(
             }
 
             is WorkoutStep.Manual -> {
-                Text(step.name)
-                Text(step.description)
+                Text(
+                    text = step.name,
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                if (step.description.isNotBlank())
+                    Text(step.description)
+                Text(
+                    text = "Série ${state.currentSet + 1} / ${step.nbSets}",
+                    style = MaterialTheme.typography.headlineSmall
+                )
                 Text("Répétitions: ${step.nbReps}")
-                Text("Série ${state.currentSet + 1} / ${step.nbSets}")
                 if (!state.isResting) {
                     Button(
                         onClick = {
@@ -103,12 +122,15 @@ fun RunnerScreen(
             }
 
             null -> {
-                Text("Séance terminée")
+                Text("Circuit terminé")
             }
         }
 
         if (state.isResting) {
-            Text("Repos")
+            Text(
+                text = "Repos",
+                style = MaterialTheme.typography.headlineSmall
+            )
             Text("${state.remainingSeconds}s")
             Button(
                 onClick = {
@@ -126,7 +148,10 @@ fun RunnerScreen(
                 )
             }
             if (state.isPaused)
-                Text("PAUSE")
+                Text(
+                    text = "EN PAUSE",
+                    style = MaterialTheme.typography.headlineSmall
+                )
 
             Button(
                 onClick = {

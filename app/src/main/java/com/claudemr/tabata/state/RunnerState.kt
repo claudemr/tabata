@@ -5,6 +5,7 @@ import com.claudemr.tabata.model.WorkoutStep
 
 data class RunnerState(
     val workout: Workout? = null,
+    val currentTurn: Int = 0,
     val currentStepIndex: Int = 0,
     val remainingSeconds: Int = 0,
     val currentSet: Int = 0,

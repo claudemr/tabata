@@ -7,5 +7,6 @@ data class Workout(
     val id: Long = 0,
     val name: String,
     val description: String,
+    val nbTurns: Int,
     val steps: MutableList<WorkoutStep> = mutableListOf()
 )
