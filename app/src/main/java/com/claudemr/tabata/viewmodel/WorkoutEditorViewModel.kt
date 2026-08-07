@@ -45,21 +45,23 @@ class WorkoutEditorViewModel(
                 steps = state.steps.toMutableList()
             )
         )
-        Log.w("TABATA", "Save Workout ${savedWorkout.name} nbTurns=${savedWorkout.nbTurns}")
 
         // Get the generated id
         state = state.copy(id = savedWorkout.id)
     }
 
     fun load(workoutId: Long) {
-        if (workoutId == 0L) {
-            state = WorkoutEditorState()
+        if (workoutId == 0L)
+            return
+
+        // If the viewmodel already contains the right workout id,
+        // no need to load it and stomp the state
+        if (state.id == workoutId) {
             return
         }
 
         val workout = repository.findById(workoutId)
             ?: return
-        Log.w("TABATA", " Load Workout ${workout.name} nbTurns=${workout.nbTurns}")
 
         state = WorkoutEditorState(
             id = workout.id,

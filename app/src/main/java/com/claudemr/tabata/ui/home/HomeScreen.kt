@@ -40,6 +40,18 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                workoutEditorViewModel.reset()
+                navController.navigate(Screen.WorkoutEditor.route(0))
+            }
+        ) {
+            Text("Nouveau circuit")
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
         Text(
             text = "Mes circuits",
             style = MaterialTheme.typography.headlineSmall
@@ -102,18 +114,6 @@ fun HomeScreen(
                     }
                 }
             }
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                workoutEditorViewModel.reset()
-                navController.navigate(Screen.WorkoutEditor.route(0))
-            }
-        ) {
-            Text("Nouvelle séance")
         }
     }
 }
