@@ -32,7 +32,7 @@ data class Duration(
             parts += "${minutes} min"
 
         if (remainingSeconds > 0 || parts.isEmpty())
-            parts += "${remainingSeconds} s"
+            parts += "${remainingSeconds} sec"
 
         return parts.joinToString(" ")
     }

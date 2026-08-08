@@ -3,6 +3,7 @@ package com.claudemr.tabata.ui.workouteditor
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -11,14 +12,11 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.claudemr.tabata.viewmodel.WorkoutEditorViewModel
 import com.claudemr.tabata.navigation.Screen
-
-import android.util.Log
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.KeyboardType
 
 @Composable
 fun WorkoutEditorScreen(
@@ -26,8 +24,11 @@ fun WorkoutEditorScreen(
     workoutEditorViewModel: WorkoutEditorViewModel,
     workoutId: Long
 ) {
+    var showDeleteDialog by remember {
+        mutableIntStateOf(-1)
+    }
+
     LaunchedEffect(workoutId) {
-        Log.d("TABATA", "workoutId=$workoutId")
         workoutEditorViewModel.load(workoutId)
     }
 
@@ -38,7 +39,7 @@ fun WorkoutEditorScreen(
     ) {
 
         Text(
-            text = "Nouveau circuit",
+            text = "Circuit",
             style = MaterialTheme.typography.headlineMedium
         )
 
@@ -127,7 +128,7 @@ fun WorkoutEditorScreen(
 
                             IconButton(
                                 onClick = {
-                                    workoutEditorViewModel.removeStep(index)
+                                    showDeleteDialog = index
                                 }
                             ) {
                                 Icon(Icons.Default.Delete, null)
@@ -153,5 +154,40 @@ fun WorkoutEditorScreen(
                 }
             }
         }
+    }
+
+    // Handle confirmation of delete
+    if (showDeleteDialog >= 0) {
+        val stepId = showDeleteDialog
+        AlertDialog(
+            onDismissRequest = {
+                showDeleteDialog = -1
+            },
+            title = {
+                Text("Supprimer un exercice ?")
+            },
+            text = {
+                Text("Voulez-vous vraiment supprimer '${workoutEditorViewModel.getStep(stepId).name}'")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        workoutEditorViewModel.removeStep(stepId)
+                        showDeleteDialog = -1
+                    }
+                ) {
+                    Text("Supprimer")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = -1
+                    }
+                ) {
+                    Text("Annuler")
+                }
+            }
+        )
     }
 }

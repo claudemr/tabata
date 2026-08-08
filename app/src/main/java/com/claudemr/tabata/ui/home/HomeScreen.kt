@@ -3,10 +3,17 @@ package com.claudemr.tabata.ui.home
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -18,13 +25,18 @@ import com.claudemr.tabata.viewmodel.WorkoutEditorViewModel
 import com.claudemr.tabata.viewmodel.appViewModel
 
 
+
 @Composable
 fun HomeScreen(
     navController: NavHostController,
     workoutEditorViewModel: WorkoutEditorViewModel,
 ) {
-    val viewModel: HomeViewModel = appViewModel()
-    val workouts by viewModel.workouts.collectAsState()
+    val homeViewModel: HomeViewModel = appViewModel()
+    val workouts by homeViewModel.workouts.collectAsState()
+
+    var showDeleteDialog by remember {
+        mutableLongStateOf(-1)
+    }
 
     Column(
         modifier = Modifier
@@ -77,21 +89,21 @@ fun HomeScreen(
                                 style = MaterialTheme.typography.titleMedium
                             )
 
-                            Text(workout.description)
+                            if (workout.description.isNotBlank())
+                                Text(workout.description)
 
                             Row {
-
-                                Button(
+                                IconButton(
                                     onClick = {
                                         navController.navigate(
                                             Screen.Runner.route(workout.id)
                                         )
                                     }
                                 ) {
-                                    Text("Lancer")
+                                    Icon(Icons.Default.PlayArrow, null)
                                 }
 
-                                Button(
+                                IconButton(
                                     onClick = {
                                         workoutEditorViewModel.reset()
                                         navController.navigate(
@@ -99,15 +111,15 @@ fun HomeScreen(
                                         )
                                     }
                                 ) {
-                                    Text("Modifier")
+                                    Icon(Icons.Default.Edit, null)
                                 }
 
-                                Button(
+                                IconButton(
                                     onClick = {
-                                        viewModel.delete(workout)
+                                        showDeleteDialog = workout.id
                                     }
                                 ) {
-                                    Text("Supprimer")
+                                    Icon(Icons.Default.Delete, null)
                                 }
                             }
                         }
@@ -115,5 +127,40 @@ fun HomeScreen(
                 }
             }
         }
+    }
+
+    // Handle confirmation of delete
+    if (showDeleteDialog >= 0) {
+        val workoutId = showDeleteDialog
+        AlertDialog(
+            onDismissRequest = {
+                showDeleteDialog = -1
+            },
+            title = {
+                Text("Supprimer le circuit ?")
+            },
+            text = {
+                Text("Voulez-vous vraiment supprimer '${homeViewModel.findById(workoutId)?.name}'")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        homeViewModel.delete(workoutId)
+                        showDeleteDialog = -1
+                    }
+                ) {
+                    Text("Supprimer")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = -1
+                    }
+                ) {
+                    Text("Annuler")
+                }
+            }
+        )
     }
 }

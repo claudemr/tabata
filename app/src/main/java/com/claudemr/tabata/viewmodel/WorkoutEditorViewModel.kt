@@ -5,7 +5,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.claudemr.tabata.model.Duration
 import com.claudemr.tabata.model.Workout
 import com.claudemr.tabata.model.WorkoutStep
 import com.claudemr.tabata.repository.IWorkoutRepository
