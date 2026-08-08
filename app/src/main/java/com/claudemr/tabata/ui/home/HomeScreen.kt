@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
@@ -112,6 +113,14 @@ fun HomeScreen(
                                     }
                                 ) {
                                     Icon(Icons.Default.Edit, null)
+                                }
+
+                                IconButton(
+                                    onClick = {
+                                        homeViewModel.copy(workout)
+                                    }
+                                ) {
+                                    Icon(Icons.Default.ContentCopy, null)
                                 }
 
                                 IconButton(

@@ -44,4 +44,12 @@ class InMemoryWorkoutRepository : IWorkoutRepository {
         _workouts.value =
             _workouts.value.filterNot { it.id == id }
     }
+
+    override fun copy(workout: Workout): Workout {
+        val list = _workouts.value.toMutableList()
+        val newWorkout = workout.copy(id = nextId++)
+        list.add(newWorkout)
+        _workouts.value = list
+        return newWorkout
+    }
 }

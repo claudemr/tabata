@@ -14,13 +14,14 @@ class HomeViewModel(
         workoutRepository.workouts
 
     fun findById(workoutId: Long) : Workout? {
-        return  workoutRepository.findById(workoutId)
+        return workoutRepository.findById(workoutId)
+    }
+
+    fun copy(workout: Workout) {
+        workoutRepository.copy(workout)
     }
 
     fun delete(workoutId: Long) {
-        val workout = workoutRepository.findById(workoutId)
-        Log.w("TABATA", "MIAOU delete ${workout?.name}")
-
-        //workoutRepository.delete(workoutId)
+        workoutRepository.delete(workoutId)
     }
 }

@@ -8,4 +8,5 @@ interface IWorkoutRepository {
     fun save(workout: Workout): Workout
     fun findById(id: Long): Workout?
     fun delete(id: Long)
+    fun copy(workout: Workout): Workout
 }

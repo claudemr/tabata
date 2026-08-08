@@ -84,6 +84,16 @@ class WorkoutEditorViewModel(
         )
     }
 
+    fun copyStep(index: Int) {
+        val step = state.steps[index]
+
+        state = state.copy(
+            steps = state.steps.toMutableList().apply {
+                add(index + 1, step)
+            }
+        )
+    }
+
     fun updateStep(index: Int, step: WorkoutStep) {
         state = state.copy(
             steps = state.steps.mapIndexed { i, current ->

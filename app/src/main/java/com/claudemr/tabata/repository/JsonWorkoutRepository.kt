@@ -32,6 +32,11 @@ class JsonWorkoutRepository(
         }
     }
 
+    override fun copy(workout: Workout): Workout {
+        val newWorkout = workout.copy(id = 0)
+        return insert(newWorkout)
+    }
+
     private fun updateDatabase(workouts: List<Workout>) {
         database = database.copy(workouts = workouts)
         _workouts.value = workouts
