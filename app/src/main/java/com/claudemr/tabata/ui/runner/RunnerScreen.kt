@@ -12,14 +12,35 @@ import com.claudemr.tabata.model.WorkoutStep
 import com.claudemr.tabata.viewmodel.RunnerViewModel
 import com.claudemr.tabata.viewmodel.appViewModel
 
+import android.app.Activity
+import android.view.WindowManager
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalView
+
+
 @Composable
 fun RunnerScreen(
     navController: NavHostController,
     workoutId: Long
 ) {
+    val view = LocalView.current
     val runnerViewModel: RunnerViewModel = appViewModel()
     val state = runnerViewModel.state
     val step = state.currentStep
+
+    DisposableEffect(runnerViewModel.state.isRunning) {
+        val window = (view.context as Activity).window
+
+        if (runnerViewModel.state.isRunning) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+
+        onDispose {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
 
     LaunchedEffect(workoutId) {
         runnerViewModel.initialize(workoutId)
