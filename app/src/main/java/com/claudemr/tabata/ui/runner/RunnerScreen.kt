@@ -39,7 +39,8 @@ fun RunnerScreen(
 
     if (state.isFinished) {
         Text(
-            text = "Circuit terminé !"
+            text = "Circuit terminé !",
+            style = MaterialTheme.typography.headlineSmall
         )
         return
     }
@@ -51,7 +52,8 @@ fun RunnerScreen(
             style = MaterialTheme.typography.headlineLarge
         )
 
-        Text("Tour ${state.currentTurn + 1} / ${state.workout?.nbTurns}")
+        if ((state.workout?.nbTurns ?: 0) > 1)
+            Text("Tour ${state.currentTurn + 1} / ${state.workout?.nbTurns}")
 
         when (step) {
             is WorkoutStep.Timed -> {
@@ -61,10 +63,11 @@ fun RunnerScreen(
                 )
                 if (step.description.isNotBlank())
                     Text(step.description)
-                Text(
-                    text = "Série ${state.currentSet + 1} / ${step.nbSets}",
-                    style = MaterialTheme.typography.headlineSmall
-                )
+                if (step.nbSets > 1)
+                    Text(
+                        text = "Série ${state.currentSet + 1} / ${step.nbSets}",
+                        style = MaterialTheme.typography.headlineSmall
+                    )
                 if (!state.isResting) {
                     Text("${state.remainingSeconds}s")
                     Button(
@@ -105,10 +108,11 @@ fun RunnerScreen(
                 )
                 if (step.description.isNotBlank())
                     Text(step.description)
-                Text(
-                    text = "Série ${state.currentSet + 1} / ${step.nbSets}",
-                    style = MaterialTheme.typography.headlineSmall
-                )
+                if (step.nbSets > 1)
+                    Text(
+                        text = "Série ${state.currentSet + 1} / ${step.nbSets}",
+                        style = MaterialTheme.typography.headlineSmall
+                    )
                 Text("Répétitions: ${step.nbReps}")
                 if (!state.isResting) {
                     Button(
