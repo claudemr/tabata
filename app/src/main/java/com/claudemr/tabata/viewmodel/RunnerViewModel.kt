@@ -21,7 +21,7 @@ class RunnerViewModel(
     var state by mutableStateOf(RunnerState())
         private set
 
-    private var timerJob: Job? = null
+    private var _timerJob: Job? = null
 
     fun initialize(workoutId: Long) = viewModelScope.launch {
         speechManager.awaitReady()
@@ -46,8 +46,17 @@ class RunnerViewModel(
         }
     }
 
+    fun stop() {
+        _timerJob?.cancel()
+        _timerJob = null
+
+        state = state.copy(
+            isRunning = false
+        )
+    }
+
     fun moveForward() {
-        timerJob?.cancel()
+        _timerJob?.cancel()
 
         when (val step = state.currentStep) {
             null -> {
@@ -91,7 +100,7 @@ class RunnerViewModel(
         if (!state.isRunning)
             return
 
-        timerJob?.cancel()
+        _timerJob?.cancel()
 
         state = state.copy(
             isRunning = false,
@@ -205,7 +214,7 @@ class RunnerViewModel(
     private fun startTimer(duration: Duration, resuming: Boolean = false) {
 
         if (!resuming)
-            timerJob?.cancel()
+            _timerJob?.cancel()
 
         val remainingSeconds = if (resuming) state.remainingSeconds else duration.seconds
         state = state.copy(
@@ -214,7 +223,7 @@ class RunnerViewModel(
             isPaused = false
         )
 
-        timerJob = viewModelScope.launch {
+        _timerJob = viewModelScope.launch {
             while (state.remainingSeconds > 0) {
                 delay(1000)
 

@@ -28,6 +28,15 @@ fun RunnerScreen(
     val state = runnerViewModel.state
     val step = state.currentStep
 
+    DisposableEffect(Unit) {
+        onDispose {
+            runnerViewModel.stop()
+
+            val window = (view.context as Activity).window
+            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
+
     DisposableEffect(runnerViewModel.state.isRunning) {
         val window = (view.context as Activity).window
 
