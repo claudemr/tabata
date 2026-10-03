@@ -2,10 +2,8 @@ package com.claudemr.tabata.viewmodel
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.StateFlow
-import com.claudemr.tabata.repository.IWorkoutRepository
+import com.claudemr.tabata.repository.*
 import com.claudemr.tabata.model.Workout
-
-import android.util.Log
 
 class HomeViewModel(
     private val workoutRepository: IWorkoutRepository
@@ -23,5 +21,13 @@ class HomeViewModel(
 
     fun delete(workoutId: Long) {
         workoutRepository.delete(workoutId)
+    }
+
+    fun exportJson(): String {
+        return workoutRepository.exportJson()
+    }
+
+    fun importJson(json: String) : ImportResult {
+        return workoutRepository.importJson(json)
     }
 }

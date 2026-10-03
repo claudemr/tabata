@@ -3,6 +3,7 @@ package com.claudemr.tabata.repository
 import com.claudemr.tabata.model.Workout
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.json.Json
 
 class InMemoryWorkoutRepository : IWorkoutRepository {
     private var nextId = 1L
@@ -51,5 +52,13 @@ class InMemoryWorkoutRepository : IWorkoutRepository {
         list.add(newWorkout)
         _workouts.value = list
         return newWorkout
+    }
+
+    override fun exportJson(): String {
+        return ""
+    }
+
+    override fun importJson(json: String) : ImportResult {
+        return ImportResult.Success
     }
 }
