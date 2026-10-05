@@ -121,14 +121,10 @@ class RunnerViewModel(
         val turnTts = if ((state.workout?.nbTurns ?: 0) <= 1) ""
                       else "Tour ${turnNumber} sur ${state.workout?.nbTurns}."
 
-        speechManager.say(
-            "Circuit ${state.workout?.name}. " + turnTts
-        ) {
-            startCurrentStep()
-        }
+        startCurrentStep("Circuit ${state.workout?.name}. ${turnTts}")
     }
 
-    private fun startCurrentStep() {
+    private fun startCurrentStep(intro : String = "") {
         val setNumber = state.currentSet + 1
 
         when (val step = state.currentStep) {
@@ -141,7 +137,7 @@ class RunnerViewModel(
                              else "Série ${setNumber} sur ${step.nbSets}. "
 
                 speechManager.say(
-                    "${step.name}. " + setTts +
+                    "${intro} ${step.name}. ${setTts}" +
                             "Durée : ${step.duration.toFrenchTts()}. " +
                             "Préparez-vous : 3, 2, 1, go!"
                 ) {
@@ -154,7 +150,8 @@ class RunnerViewModel(
                              else "Série ${setNumber} sur ${step.nbSets}. "
 
                 speechManager.say(
-                    "${step.name}. " + setTts + "${step.nbReps} répétitions."
+                    "${intro} ${step.name}. ${setTts}" +
+                            "${step.nbReps} répétitions."
                 )
                 state = state.copy(
                     isRunning = false
@@ -202,13 +199,11 @@ class RunnerViewModel(
             return
         }
 
-        speechManager.say("Exercice suivant") {
-            state = state.copy(
-                currentStepIndex = nextIndex,
-                currentSet = 0
-            )
-            startCurrentStep()
-        }
+        state = state.copy(
+            currentStepIndex = nextIndex,
+            currentSet = 0
+        )
+        startCurrentStep("Exercice suivant. ")
     }
 
     private fun startTimer(duration: Duration, resuming: Boolean = false) {

@@ -89,8 +89,6 @@ class JsonWorkoutRepository(
             return
         }
 
-
-
         _database = try {
             val loadedDatabase =
                 _json.decodeFromString<WorkoutDatabase>(
